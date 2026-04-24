@@ -47,6 +47,27 @@ def test_roll_schedule_contract_order_and_gap():
     assert schedule.iloc[0]["roll_gap"] == 3.0
 
 
+def test_empty_roll_schedule_keeps_expected_columns():
+    contracts = [ContractInfo("MNQ", "NMH24", 3, 2024, Path("Hour_MNQ_20240300.csv"))]
+    rows = pd.DataFrame(
+        [
+            {
+                "timestamp": pd.Timestamp("2024-03-08 21:00", tz="UTC"),
+                "contract": "NMH24",
+                "close": 100.0,
+            }
+        ]
+    )
+    instrument = {"timezone": "America/Chicago", "session_end": "16:00"}
+    rule = {"method": "calendar", "roll_at": "session_end"}
+
+    schedule = build_roll_schedule("MNQ", contracts, rows, instrument, rule, 5)
+
+    assert schedule.empty
+    assert "roll_timestamp" in schedule.columns
+    assert "old_contract" in schedule.columns
+
+
 def test_infer_contract_info_from_bcutils_hourly_filename():
     info = infer_contract_info(Path("Hour_MES_20240300.csv"), "MES")
 

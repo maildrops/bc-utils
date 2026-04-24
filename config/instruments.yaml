@@ -2,7 +2,7 @@ instruments:
   MES:
     description: "Micro E-mini S&P 500"
     exchange: "CME"
-    barchart_root: "MES"
+    barchart_root: "ET"
     month_cycle: "HMUZ"
     timezone: "America/Chicago"
     roll_days_before_expiry: 5
@@ -12,7 +12,7 @@ instruments:
   MNQ:
     description: "Micro E-mini Nasdaq 100"
     exchange: "CME"
-    barchart_root: "MNQ"
+    barchart_root: "NM"
     month_cycle: "HMUZ"
     timezone: "America/Chicago"
     roll_days_before_expiry: 5

@@ -68,6 +68,12 @@ Download hourly raw contract files:
 uv run python scripts/download_barchart_hourly.py --symbol MES --credentials private_config.yaml
 ```
 
+For a low-quota smoke test, download one contract:
+
+```bash
+uv run python scripts/download_barchart_hourly.py --symbol MES --contract ETH24 --credentials private_config.yaml
+```
+
 The script saves raw Barchart hourly files under:
 
 ```text

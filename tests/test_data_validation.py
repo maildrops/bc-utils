@@ -1,5 +1,6 @@
 import pandas as pd
 
+from bcutils.research.io import normalize_columns
 from bcutils.research.validation import validate_frame
 
 
@@ -26,6 +27,33 @@ def test_validation_detects_ohlc_sanity_failures():
 
     assert not sanity["passed"]
     assert sanity["count"] == 1
+
+
+def test_normalize_columns_accepts_barchart_latest_close_header():
+    frame = pd.DataFrame(
+        [
+            {
+                "Time": "2023-03-06T15:00:00+0000",
+                "Open": 13050.0,
+                "High": 13060.0,
+                "Low": 13050.0,
+                "Latest": 13060.0,
+                "Volume": 2,
+            }
+        ]
+    )
+
+    normalized = normalize_columns(frame)
+
+    assert list(normalized.columns) == [
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+    ]
+    assert normalized.iloc[0]["close"] == 13060.0
 
 
 def row(timestamp, open_, high, low, close, volume):

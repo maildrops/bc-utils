@@ -40,17 +40,21 @@ def main() -> None:
         adjusted_path = hourly_dir / f"{symbol}_60min_backadjusted.csv"
         schedule_path = hourly_dir / f"{symbol}_roll_schedule.csv"
         if adjusted_path.exists() and schedule_path.exists():
-            adjusted = pd.read_csv(adjusted_path)
-            adjusted["timestamp"] = pd.to_datetime(adjusted["timestamp"], utc=True)
-            schedule = pd.read_csv(schedule_path)
-            schedule["roll_timestamp"] = pd.to_datetime(
-                schedule["roll_timestamp"], utc=True
-            )
-            reports.append(
-                validate_roll_continuity(
-                    adjusted, schedule, f"{symbol}_roll_continuity"
+            try:
+                schedule = pd.read_csv(schedule_path)
+            except pd.errors.EmptyDataError:
+                schedule = pd.DataFrame()
+            if not schedule.empty:
+                adjusted = pd.read_csv(adjusted_path)
+                adjusted["timestamp"] = pd.to_datetime(adjusted["timestamp"], utc=True)
+                schedule["roll_timestamp"] = pd.to_datetime(
+                    schedule["roll_timestamp"], utc=True
                 )
-            )
+                reports.append(
+                    validate_roll_continuity(
+                        adjusted, schedule, f"{symbol}_roll_continuity"
+                    )
+                )
         for path in sorted((args.data_root / "aggregated").glob(f"*/*{symbol}_*.csv")):
             reports.append(validate_file(path, path.stem))
         report = pd.concat(reports, ignore_index=True) if reports else pd.DataFrame()

@@ -22,6 +22,7 @@ COLUMN_ALIASES = {
     "low": "low",
     "close": "close",
     "last": "close",
+    "latest": "close",
     "volume": "volume",
     "vol": "volume",
 }

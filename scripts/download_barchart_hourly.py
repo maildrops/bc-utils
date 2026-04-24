@@ -36,6 +36,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--symbol", required=True, help="Instrument symbol, or ALL")
     parser.add_argument(
+        "--contract",
+        default=None,
+        help="Optional single Barchart contract ID to download, e.g. ETH24",
+    )
+    parser.add_argument(
         "--credentials",
         "--config",
         dest="credentials",
@@ -105,15 +110,45 @@ def contracts_to_download(
     raw_dir: Path,
     start_year: int,
     end_year: int,
+    contract: str | None = None,
 ) -> List[str]:
-    requested = _build_contract_list(
-        start_year,
-        end_year,
-        instr_list=[symbol],
-        contract_map=contract_map,
-    )
+    if contract is None:
+        requested = _build_contract_list(
+            start_year,
+            end_year,
+            instr_list=[symbol],
+            contract_map=contract_map,
+        )
+    else:
+        requested = [normalize_requested_contract(symbol, contract, contract_map)]
     existing = existing_contracts(raw_dir, symbol)
-    return [contract for contract in requested if contract not in existing]
+    existing_keys = {contract_month_year_key(contract) for contract in existing}
+    return [
+        contract
+        for contract in requested
+        if contract_month_year_key(contract) not in existing_keys
+    ]
+
+
+def contract_month_year_key(contract: str) -> tuple[int, int]:
+    month, year = _get_contract_month_year(contract)
+    return year, month
+
+
+def normalize_requested_contract(
+    symbol: str,
+    contract: str,
+    contract_map: Dict[str, Dict[str, str]],
+) -> str:
+    contract = contract.upper()
+    expected_root = contract_map[symbol]["code"].upper()
+    if not contract.startswith(expected_root):
+        raise ValueError(
+            f"Contract {contract!r} does not match {symbol} "
+            f"Barchart root {expected_root!r}"
+        )
+    _get_contract_month_year(contract)
+    return contract
 
 
 def download_symbol(
@@ -164,6 +199,8 @@ def main() -> None:
     private_config = load_private_config(args.credentials)
     instruments = load_instruments(args.config_dir)
     symbols = selected_symbols(args.symbol, instruments)
+    if args.contract and len(symbols) != 1:
+        raise SystemExit("--contract can only be used with one concrete --symbol")
     contract_map = contract_map_for_symbols(instruments, symbols)
     start_year = int(
         args.start_year or private_config.get("barchart_start_year") or 2020
@@ -179,6 +216,7 @@ def main() -> None:
             raw_dir,
             start_year,
             end_year,
+            args.contract,
         )
         print(f"{symbol}: {len(planned[symbol])} hourly contracts pending")
 

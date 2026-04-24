@@ -83,7 +83,20 @@ def build_roll_schedule(
                 "roll_days_before_expiry": roll_days,
             }
         )
-    return pd.DataFrame(rows)
+    columns = [
+        "symbol",
+        "old_contract",
+        "new_contract",
+        "roll_timestamp",
+        "roll_date",
+        "old_close",
+        "new_close",
+        "roll_gap",
+        "cumulative_adjustment_after_roll",
+        "roll_rule",
+        "roll_days_before_expiry",
+    ]
+    return pd.DataFrame(rows, columns=columns)
 
 
 def close_at_or_before(
@@ -177,7 +190,8 @@ def apply_difference_backadjustment(
         "is_roll_bar",
         "roll_id",
     ]
-    return adjusted[ordered], pd.DataFrame(adjustment_rows)
+    adjustment_columns = ["timestamp", "contract", "adjustment", "reason"]
+    return adjusted[ordered], pd.DataFrame(adjustment_rows, columns=adjustment_columns)
 
 
 def save_continuous_result(

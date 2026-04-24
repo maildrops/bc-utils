@@ -81,6 +81,15 @@ uv run python scripts/download_barchart_hourly.py --symbol MES --dry-run
 uv run python scripts/download_barchart_hourly.py --symbol MES --credentials private_config.yaml
 ```
 
+For a free-account smoke test, download a single contract:
+
+```bash
+uv run python scripts/download_barchart_hourly.py \
+  --symbol MES \
+  --contract ETH24 \
+  --credentials private_config.yaml
+```
+
 `private_config.yaml` may provide `barchart_start_year` and `barchart_end_year`.
 You can override them at the command line:
 
