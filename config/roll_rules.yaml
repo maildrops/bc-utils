@@ -1,0 +1,7 @@
+default_roll_rule:
+  method: "calendar"
+  roll_days_before_expiry: 5
+  roll_at: "session_end"
+  adjustment_method: "difference"
+  adjustment_price: "close"
+  skip_roll_day_entries_flag: true

@@ -1,0 +1,28 @@
+base_timeframe: "60min"
+drop_incomplete_bars: false
+timeframes:
+  - name: "120min"
+    pandas_rule: "120min"
+    anchored_to_session: true
+
+  - name: "240min"
+    pandas_rule: "240min"
+    anchored_to_session: true
+
+  - name: "360min"
+    pandas_rule: "360min"
+    anchored_to_session: true
+
+  - name: "720min"
+    pandas_rule: "720min"
+    anchored_to_session: true
+
+  - name: "session"
+    type: "custom_session"
+    session_start: "17:00"
+    session_end: "16:00"
+
+  - name: "daily"
+    type: "session_daily"
+    session_start: "17:00"
+    session_end: "16:00"

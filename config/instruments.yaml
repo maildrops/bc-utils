@@ -1,0 +1,40 @@
+instruments:
+  MES:
+    description: "Micro E-mini S&P 500"
+    exchange: "CME"
+    barchart_root: "MES"
+    month_cycle: "HMUZ"
+    timezone: "America/Chicago"
+    roll_days_before_expiry: 5
+    session_start: "17:00"
+    session_end: "16:00"
+
+  MNQ:
+    description: "Micro E-mini Nasdaq 100"
+    exchange: "CME"
+    barchart_root: "MNQ"
+    month_cycle: "HMUZ"
+    timezone: "America/Chicago"
+    roll_days_before_expiry: 5
+    session_start: "17:00"
+    session_end: "16:00"
+
+  MGC:
+    description: "Micro Gold"
+    exchange: "COMEX"
+    barchart_root: "MGC"
+    month_cycle: "GJMQVZ"
+    timezone: "America/Chicago"
+    roll_days_before_expiry: 5
+    session_start: "17:00"
+    session_end: "16:00"
+
+  MCL:
+    description: "Micro WTI Crude Oil"
+    exchange: "NYMEX"
+    barchart_root: "MCL"
+    month_cycle: "FGHJKMNQUVXZ"
+    timezone: "America/Chicago"
+    roll_days_before_expiry: 5
+    session_start: "17:00"
+    session_end: "16:00"

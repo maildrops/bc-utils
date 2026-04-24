@@ -37,4 +37,16 @@ inc/
 /.idea
 /.env
 /.venv
-/data
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+.codex
+
+# Keep raw market data and derived outputs local by default.
+data/raw_contracts/**/*.csv
+data/continuous/hourly/*.csv
+data/aggregated/**/*.csv
+data/validation/*.csv
