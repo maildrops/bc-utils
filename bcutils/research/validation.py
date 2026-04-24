@@ -39,10 +39,11 @@ def validate_frame(
                 name, "nonzero_adjustments", True, int((frame["adjustment"] != 0).sum())
             )
         )
-    missing = missing_hourly_by_session(frame)
-    checks.append(
-        row(name, "sessions_with_lt_20_hourly_bars", missing.empty, len(missing))
-    )
+    if is_hourly_dataset(frame, name):
+        missing = missing_hourly_by_session(frame)
+        checks.append(
+            row(name, "sessions_with_lt_20_hourly_bars", missing.empty, len(missing))
+        )
     return pd.DataFrame(checks)
 
 
@@ -57,6 +58,14 @@ def missing_hourly_by_session(frame: pd.DataFrame) -> pd.DataFrame:
     counts = frame.groupby(local_dates).size().reset_index(name="actual_bars")
     counts = counts.rename(columns={"timestamp": "date"})
     return counts[counts["actual_bars"] < 20]
+
+
+def is_hourly_dataset(frame: pd.DataFrame, name: str) -> bool:
+    if "target_timeframe" in frame.columns:
+        target = frame["target_timeframe"].dropna().astype(str)
+        if not target.empty:
+            return target.iloc[0] in {"60min", "hourly"}
+    return "_60min_" in name or name.endswith("_60min")
 
 
 def validate_file(path: Path, name: str) -> pd.DataFrame:

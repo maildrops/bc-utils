@@ -56,6 +56,21 @@ def test_normalize_columns_accepts_barchart_latest_close_header():
     assert normalized.iloc[0]["close"] == 13060.0
 
 
+def test_validation_skips_hourly_missing_bar_check_for_aggregated_data():
+    frame = pd.DataFrame(
+        [
+            {
+                **row("2024-01-01 00:00", 10, 11, 9, 10, 1),
+                "target_timeframe": "240min",
+            }
+        ]
+    )
+
+    report = validate_frame(frame, "sample_240min_backadjusted")
+
+    assert "sessions_with_lt_20_hourly_bars" not in set(report["check"])
+
+
 def row(timestamp, open_, high, low, close, volume):
     return {
         "timestamp": pd.Timestamp(timestamp, tz="UTC"),

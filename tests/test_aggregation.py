@@ -49,6 +49,23 @@ def test_session_grouping_is_not_naive_midnight():
     assert local.iloc[2]["session_date"].isoformat() == "2024-01-02"
 
 
+def test_intraday_aggregation_returns_globally_sorted_rows():
+    frame = pd.DataFrame(
+        [
+            row("2024-01-03 01:00", 13, 15, 12, 14, 300),
+            row("2024-01-03 00:00", 11, 14, 10, 13, 200),
+            row("2024-01-02 23:00", 10, 12, 9, 11, 100),
+            row("2024-01-04 00:00", 15, 17, 14, 16, 500),
+            row("2024-01-03 23:00", 14, 16, 13, 15, 400),
+        ]
+    )
+    timeframe = {"name": "120min", "pandas_rule": "120min", "anchored_to_session": True}
+
+    result = aggregate_timeframe(frame, "MES", timeframe, INSTRUMENT, "backadjusted")
+
+    assert result["timestamp"].is_monotonic_increasing
+
+
 def row(timestamp, open_, high, low, close, volume):
     return {
         "timestamp": pd.Timestamp(timestamp, tz="UTC"),

@@ -74,7 +74,7 @@ def aggregate_intraday(
     result["source_timeframe"] = "60min"
     result["target_timeframe"] = timeframe["name"]
     result["is_complete"] = result["source_count"] >= expected
-    return result
+    return result.sort_values("timestamp").reset_index(drop=True)
 
 
 def aggregate_session(
@@ -109,7 +109,9 @@ def aggregate_session(
                 "is_complete": True,
             }
         )
-    return pd.DataFrame(rows)
+    if not rows:
+        return pd.DataFrame()
+    return pd.DataFrame(rows).sort_values("timestamp").reset_index(drop=True)
 
 
 def first_joined(values: pd.Series) -> str:
