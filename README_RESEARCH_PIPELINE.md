@@ -71,19 +71,19 @@ Barchart Premier web downloads have a 10,000-record limit per request. Version 1
 Build one symbol:
 
 ```bash
-python scripts/build_continuous.py --symbol MES
+uv run python scripts/build_continuous.py --symbol MES
 ```
 
 Build all configured symbols:
 
 ```bash
-python scripts/build_continuous.py --symbol ALL
+uv run python scripts/build_continuous.py --symbol ALL
 ```
 
 Try a roll-day sensitivity run:
 
 ```bash
-python scripts/build_continuous.py --symbol MES --roll-days 7
+uv run python scripts/build_continuous.py --symbol MES --roll-days 7
 ```
 
 Outputs:
@@ -102,13 +102,13 @@ Back-adjustment uses constant difference adjustment. At each roll, the new contr
 Aggregate all configured timeframes:
 
 ```bash
-python scripts/aggregate_bars.py --symbol MES --source backadjusted
+uv run python scripts/aggregate_bars.py --symbol MES --source backadjusted
 ```
 
 Aggregate one timeframe:
 
 ```bash
-python scripts/aggregate_bars.py --symbol MES --source backadjusted --timeframe 240min
+uv run python scripts/aggregate_bars.py --symbol MES --source backadjusted --timeframe 240min
 ```
 
 Outputs are written under:
@@ -129,7 +129,7 @@ Intraday aggregations are anchored to the configured session start. Session and 
 Run:
 
 ```bash
-python scripts/validate_data.py --symbol MES --write-csv
+uv run python scripts/validate_data.py --symbol MES --write-csv
 ```
 
 Validation checks duplicate timestamps, timestamp sorting, OHLC sanity, non-negative volume, large close jumps, roll bars, and adjustment values. CSV reports are written to:
@@ -143,7 +143,7 @@ data/validation/{SYMBOL}_validation_report.csv
 Run:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 The tests cover calendar roll dates, contract ordering, back-adjustment, aggregation, session grouping, and validation checks.

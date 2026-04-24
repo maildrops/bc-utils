@@ -4,6 +4,25 @@
 
 ## Quickstart
 
+Set up the project with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv sync --dev
+```
+
+Run scripts and tests through uv so they use the project environment:
+
+```bash
+uv run pytest
+uv run python sample/pst.py
+```
+
+Full docs:
+
+- [Installation guide](docs/installation.md)
+- [User guide](docs/user_guide.md)
+- [Research pipeline notes](README_RESEARCH_PIPELINE.md)
+
 ```
 import os
 import logging
