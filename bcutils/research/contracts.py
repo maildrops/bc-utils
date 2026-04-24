@@ -44,7 +44,27 @@ class ContractInfo:
 def infer_contract_info(path: Path, symbol: str) -> ContractInfo:
     stem = path.stem.upper()
     symbol = symbol.upper()
-    pattern = re.compile(rf"{re.escape(symbol)}[^A-Z0-9]*([FGHJKMNQUVXZ])[^0-9]*(\d{{1,4}})")
+    split_freq = re.match(
+        rf"^(?:HOUR|DAY)_{re.escape(symbol)}_(\d{{4}})(\d{{2}})00$", stem
+    )
+    if split_freq:
+        year_text, month_text = split_freq.groups()
+        year = int(year_text)
+        month = int(month_text)
+        if month not in MONTH_NUM_TO_CODE:
+            raise ValueError(f"Cannot infer contract month from {path.name}")
+        month_code = MONTH_NUM_TO_CODE[month]
+        contract = f"{symbol}{month_code}{str(year)[-2:]}"
+        return ContractInfo(
+            symbol=symbol,
+            contract=contract,
+            contract_month=month,
+            contract_year=year,
+            source_file=path,
+        )
+    pattern = re.compile(
+        rf"{re.escape(symbol)}[^A-Z0-9]*([FGHJKMNQUVXZ])[^0-9]*(\d{{1,4}})"
+    )
     match = pattern.search(stem)
     if not match:
         generic = re.search(r"([FGHJKMNQUVXZ])[^0-9]*(\d{1,4})", stem)
@@ -117,7 +137,9 @@ def roll_timestamp_utc(
     roll_date = subtract_trading_days(expiry, roll_days)
     time_text = instrument["session_end"] if roll_at == "session_end" else roll_at
     local_time = time.fromisoformat(time_text)
-    local_dt = datetime.combine(roll_date, local_time, tzinfo=ZoneInfo(instrument["timezone"]))
+    local_dt = datetime.combine(
+        roll_date, local_time, tzinfo=ZoneInfo(instrument["timezone"])
+    )
     return pd.Timestamp(local_dt).tz_convert("UTC")
 
 

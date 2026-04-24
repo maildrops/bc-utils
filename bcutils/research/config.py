@@ -30,7 +30,9 @@ def load_aggregation_config(config_dir: Path | None = None) -> Dict[str, Any]:
     return load_yaml(config_dir / "aggregation.yaml")
 
 
-def selected_symbols(requested: str, instruments: Dict[str, Dict[str, Any]]) -> List[str]:
+def selected_symbols(
+    requested: str, instruments: Dict[str, Dict[str, Any]]
+) -> List[str]:
     if requested.upper() == "ALL":
         return sorted(instruments.keys())
     symbol = requested.upper()

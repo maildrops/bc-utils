@@ -27,7 +27,10 @@ def aggregate_timeframe(
     source: str,
 ) -> pd.DataFrame:
     tf_type = timeframe.get("type")
-    if tf_type in {"custom_session", "session_daily"} or timeframe["name"] in {"session", "daily"}:
+    if tf_type in {"custom_session", "session_daily"} or timeframe["name"] in {
+        "session",
+        "daily",
+    }:
         return aggregate_session(frame, symbol, timeframe["name"], instrument, source)
     return aggregate_intraday(frame, symbol, timeframe, instrument, source)
 
@@ -46,7 +49,9 @@ def aggregate_intraday(
     for _, session_rows in grouped:
         session_rows = session_rows.sort_values("timestamp").set_index("timestamp")
         origin = session_rows.index.min()
-        bars = session_rows.resample(rule, origin=origin, label="left", closed="left").agg(
+        bars = session_rows.resample(
+            rule, origin=origin, label="left", closed="left"
+        ).agg(
             open=("open", "first"),
             high=("high", "max"),
             low=("low", "min"),
@@ -59,7 +64,9 @@ def aggregate_intraday(
             contains_roll_bar=("is_roll_bar", "max"),
             source_count=("close", "count"),
         )
-        pieces.append(bars.dropna(subset=["open", "high", "low", "close"]).reset_index())
+        pieces.append(
+            bars.dropna(subset=["open", "high", "low", "close"]).reset_index()
+        )
     if not pieces:
         return pd.DataFrame()
     result = pd.concat(pieces, ignore_index=True)
@@ -90,7 +97,9 @@ def aggregate_session(
                 "low": group["low"].min(),
                 "close": group.iloc[-1]["close"],
                 "volume": group["volume"].sum(),
-                "source": first_joined(group["source"]) if "source" in group.columns else "",
+                "source": first_joined(group["source"])
+                if "source" in group.columns
+                else "",
                 "source_timeframe": "60min",
                 "target_timeframe": target,
                 "first_contract": group.iloc[0]["contract"],
@@ -108,7 +117,9 @@ def first_joined(values: pd.Series) -> str:
     return "+".join(unique)
 
 
-def with_session_columns(frame: pd.DataFrame, instrument: Dict[str, str]) -> pd.DataFrame:
+def with_session_columns(
+    frame: pd.DataFrame, instrument: Dict[str, str]
+) -> pd.DataFrame:
     result = frame.copy()
     tz = ZoneInfo(instrument["timezone"])
     session_start = time.fromisoformat(instrument["session_start"])
@@ -123,7 +134,9 @@ def with_session_columns(frame: pd.DataFrame, instrument: Dict[str, str]) -> pd.
     return result
 
 
-def save_aggregated(frame: pd.DataFrame, data_root: Path, symbol: str, timeframe: str, source: str) -> Path:
+def save_aggregated(
+    frame: pd.DataFrame, data_root: Path, symbol: str, timeframe: str, source: str
+) -> Path:
     path = data_root / "aggregated" / timeframe / f"{symbol}_{timeframe}_{source}.csv"
     write_csv(frame, path)
     return path

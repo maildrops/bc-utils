@@ -72,6 +72,29 @@ uv run python sample/pst.py
 
 Do not commit private config files containing credentials.
 
+For the research pipeline, use the wrapper script that writes hourly contracts
+into `data/raw_contracts/{SYMBOL}/`:
+
+```bash
+cp sample/private_config_sample.yaml private_config.yaml
+uv run python scripts/download_barchart_hourly.py --symbol MES --dry-run
+uv run python scripts/download_barchart_hourly.py --symbol MES --credentials private_config.yaml
+```
+
+`private_config.yaml` may provide `barchart_start_year` and `barchart_end_year`.
+You can override them at the command line:
+
+```bash
+uv run python scripts/download_barchart_hourly.py \
+  --symbol MES \
+  --credentials private_config.yaml \
+  --start-year 2024 \
+  --end-year 2026
+```
+
+Downloaded files use the existing bc-utils naming convention, for example
+`Hour_MES_20240300.csv`. Existing raw files are skipped before downloading.
+
 ## Research Pipeline Inputs
 
 The research pipeline expects raw hourly contract CSVs under:
@@ -83,10 +106,13 @@ data/raw_contracts/{SYMBOL}/
 Examples:
 
 ```text
-data/raw_contracts/MES/MESH24.csv
-data/raw_contracts/MES/MESM24.csv
-data/raw_contracts/MES/MESU24.csv
+data/raw_contracts/MES/Hour_MES_20240300.csv
+data/raw_contracts/MES/Hour_MES_20240600.csv
+data/raw_contracts/MES/Hour_MES_20240900.csv
 ```
+
+The loader also accepts contract-style names such as `MESH24.csv`, `MESM24.csv`,
+and `MESU24.csv`.
 
 Input files are normalized internally to:
 

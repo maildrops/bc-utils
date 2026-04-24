@@ -8,10 +8,14 @@ import pandas as pd
 from bcutils.research.io import write_csv
 
 
-def validate_frame(frame: pd.DataFrame, name: str, jump_tolerance: float = 0.05) -> pd.DataFrame:
+def validate_frame(
+    frame: pd.DataFrame, name: str, jump_tolerance: float = 0.05
+) -> pd.DataFrame:
     checks: List[Dict[str, object]] = []
     duplicate_count = int(frame["timestamp"].duplicated().sum())
-    checks.append(row(name, "duplicate_timestamps", duplicate_count == 0, duplicate_count))
+    checks.append(
+        row(name, "duplicate_timestamps", duplicate_count == 0, duplicate_count)
+    )
     sorted_ok = bool(frame["timestamp"].is_monotonic_increasing)
     checks.append(row(name, "timestamps_sorted", sorted_ok, 0 if sorted_ok else 1))
     ohlc_bad = frame[
@@ -26,11 +30,19 @@ def validate_frame(frame: pd.DataFrame, name: str, jump_tolerance: float = 0.05)
     jump_count = int((jumps > jump_tolerance).sum())
     checks.append(row(name, "large_close_jumps", jump_count == 0, jump_count))
     if "is_roll_bar" in frame.columns:
-        checks.append(row(name, "roll_bars", True, int(frame["is_roll_bar"].astype(bool).sum())))
+        checks.append(
+            row(name, "roll_bars", True, int(frame["is_roll_bar"].astype(bool).sum()))
+        )
     if "adjustment" in frame.columns:
-        checks.append(row(name, "nonzero_adjustments", True, int((frame["adjustment"] != 0).sum())))
+        checks.append(
+            row(
+                name, "nonzero_adjustments", True, int((frame["adjustment"] != 0).sum())
+            )
+        )
     missing = missing_hourly_by_session(frame)
-    checks.append(row(name, "sessions_with_lt_20_hourly_bars", missing.empty, len(missing)))
+    checks.append(
+        row(name, "sessions_with_lt_20_hourly_bars", missing.empty, len(missing))
+    )
     return pd.DataFrame(checks)
 
 
@@ -72,7 +84,14 @@ def validate_roll_continuity(
         before = adjusted[adjusted["timestamp"] < roll_ts]
         after = adjusted[adjusted["timestamp"] >= roll_ts]
         if before.empty or after.empty:
-            checks.append(row(name, f"roll_continuity_{roll['old_contract']}_to_{roll['new_contract']}", False, 1))
+            checks.append(
+                row(
+                    name,
+                    f"roll_continuity_{roll['old_contract']}_to_{roll['new_contract']}",
+                    False,
+                    1,
+                )
+            )
             continue
         gap = abs(float(after.iloc[0]["close"]) - float(before.iloc[-1]["close"]))
         checks.append(

@@ -50,7 +50,25 @@ Roll behavior is in `config/roll_rules.yaml`. Version 1 supports calendar rolls 
 
 ## Download Raw Hourly Data
 
-Use the existing bc-utils/Barchart workflow to download hourly contract CSVs. Save each contract file in:
+Create a private config file with your Barchart credentials:
+
+```bash
+cp sample/private_config_sample.yaml private_config.yaml
+```
+
+Edit `private_config.yaml`, then run a dry-run first:
+
+```bash
+uv run python scripts/download_barchart_hourly.py --symbol MES --dry-run
+```
+
+Download hourly raw contract files:
+
+```bash
+uv run python scripts/download_barchart_hourly.py --symbol MES --credentials private_config.yaml
+```
+
+The script saves raw Barchart hourly files under:
 
 ```text
 data/raw_contracts/{SYMBOL}/
@@ -59,10 +77,12 @@ data/raw_contracts/{SYMBOL}/
 For example:
 
 ```text
-data/raw_contracts/MES/MESH24.csv
-data/raw_contracts/MES/MESM24.csv
-data/raw_contracts/MES/MESU24.csv
+data/raw_contracts/MES/Hour_MES_20240300.csv
+data/raw_contracts/MES/Hour_MES_20240600.csv
+data/raw_contracts/MES/Hour_MES_20240900.csv
 ```
+
+Existing files are skipped so Barchart allowance is not wasted. The loader also accepts contract-style names such as `MESH24.csv`.
 
 Barchart Premier web downloads have a 10,000-record limit per request. Version 1 deliberately avoids changing Barchart 5-minute or 1-minute download behavior.
 

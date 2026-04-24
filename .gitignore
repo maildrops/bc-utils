@@ -36,6 +36,7 @@ inc/
 
 /.idea
 /.env
+private_config.yaml
 /.venv
 __pycache__/
 *.py[cod]

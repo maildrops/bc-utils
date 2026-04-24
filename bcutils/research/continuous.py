@@ -29,9 +29,17 @@ def build_continuous_series(
     contracts = contract_infos(data_root, symbol)
     if not contracts:
         raise FileNotFoundError(f"No contracts found for {symbol}")
-    all_rows = load_all_contracts(data_root, symbol, timezone=str(instrument.get("timezone", "UTC")))
-    roll_days = int(roll_days_override or instrument.get("roll_days_before_expiry") or roll_rule["roll_days_before_expiry"])
-    schedule = build_roll_schedule(symbol, contracts, all_rows, instrument, roll_rule, roll_days)
+    all_rows = load_all_contracts(
+        data_root, symbol, timezone=str(instrument.get("timezone", "UTC"))
+    )
+    roll_days = int(
+        roll_days_override
+        or instrument.get("roll_days_before_expiry")
+        or roll_rule["roll_days_before_expiry"]
+    )
+    schedule = build_roll_schedule(
+        symbol, contracts, all_rows, instrument, roll_rule, roll_days
+    )
     unadjusted = select_active_contract_rows(all_rows, contracts, schedule)
     backadjusted, adjustments = apply_difference_backadjustment(unadjusted, schedule)
     return ContinuousResult(unadjusted, backadjusted, schedule, adjustments)
@@ -78,7 +86,9 @@ def build_roll_schedule(
     return pd.DataFrame(rows)
 
 
-def close_at_or_before(frame: pd.DataFrame, contract: str, timestamp: pd.Timestamp) -> float:
+def close_at_or_before(
+    frame: pd.DataFrame, contract: str, timestamp: pd.Timestamp
+) -> float:
     rows = frame[(frame["contract"] == contract) & (frame["timestamp"] <= timestamp)]
     if rows.empty:
         rows = frame[frame["contract"] == contract]
@@ -109,7 +119,9 @@ def select_active_contract_rows(
     if not pieces:
         return pd.DataFrame()
     result = pd.concat(pieces, ignore_index=True).sort_values("timestamp")
-    return result.drop_duplicates(subset=["timestamp"], keep="last").reset_index(drop=True)
+    return result.drop_duplicates(subset=["timestamp"], keep="last").reset_index(
+        drop=True
+    )
 
 
 def apply_difference_backadjustment(
@@ -135,7 +147,9 @@ def apply_difference_backadjustment(
         if roll_mask.any():
             first_idx = adjusted.loc[roll_mask].index[0]
             adjusted.loc[first_idx, "is_roll_bar"] = True
-            adjusted.loc[first_idx, "roll_id"] = f"{roll['old_contract']}_to_{roll['new_contract']}"
+            adjusted.loc[
+                first_idx, "roll_id"
+            ] = f"{roll['old_contract']}_to_{roll['new_contract']}"
         adjustment_rows.append(
             {
                 "timestamp": ts,
@@ -166,7 +180,9 @@ def apply_difference_backadjustment(
     return adjusted[ordered], pd.DataFrame(adjustment_rows)
 
 
-def save_continuous_result(result: ContinuousResult, symbol: str, data_root: Path) -> None:
+def save_continuous_result(
+    result: ContinuousResult, symbol: str, data_root: Path
+) -> None:
     out_dir = data_root / "continuous" / "hourly"
     write_csv(result.unadjusted, out_dir / f"{symbol}_60min_unadjusted.csv")
     write_csv(result.backadjusted, out_dir / f"{symbol}_60min_backadjusted.csv")
