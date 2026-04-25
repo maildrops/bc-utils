@@ -20,6 +20,7 @@ scripts/
   download_barchart_hourly.py
   build_continuous.py
   aggregate_bars.py
+  export_ohlc.py
   validate_data.py
 ```
 
@@ -173,6 +174,26 @@ uv run pytest
 ```
 
 The tests cover calendar roll dates, contract ordering, back-adjustment, aggregation, session grouping, and validation checks.
+
+## Export For Backtesting Apps
+
+Export any generated OHLC file to a simple `Date,Time,Open,High,Low,Close,Volume` format:
+
+```bash
+uv run python scripts/export_ohlc.py --symbol MNQ --timeframe 240min --source backadjusted --timezone America/Chicago
+```
+
+Export all generated back-adjusted continuous and aggregated files:
+
+```bash
+uv run python scripts/export_ohlc.py --all --source backadjusted --timezone America/Chicago
+```
+
+Exports are written to:
+
+```text
+data/backtest_exports/
+```
 
 ## Known Limitations
 

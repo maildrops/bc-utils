@@ -35,6 +35,7 @@ inc/
 /*.zip
 
 /.idea
+.DS_Store
 /.env
 private_config.yaml
 /.venv
@@ -51,3 +52,4 @@ data/raw_contracts/**/*.csv
 data/continuous/hourly/*.csv
 data/aggregated/**/*.csv
 data/validation/*.csv
+data/backtest_exports/*.csv

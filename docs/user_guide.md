@@ -279,6 +279,94 @@ CSV reports are written to:
 data/validation/{SYMBOL}_validation_report.csv
 ```
 
+## Export OHLC For Backtesting Apps
+
+Use `scripts/export_ohlc.py` after building continuous data and, if needed,
+aggregated data. It does not change the pipeline files; it writes a simplified
+copy for backtesting apps.
+
+The exported format is:
+
+```text
+Date,Time,Open,High,Low,Close,Volume
+```
+
+Export one hourly continuous dataset:
+
+```bash
+uv run python scripts/export_ohlc.py \
+  --symbol MNQ \
+  --timeframe 60min \
+  --source backadjusted \
+  --timezone America/Chicago
+```
+
+Export one aggregated dataset:
+
+```bash
+uv run python scripts/export_ohlc.py \
+  --symbol MNQ \
+  --timeframe 240min \
+  --source backadjusted \
+  --timezone America/Chicago
+```
+
+The input for the second example is:
+
+```text
+data/aggregated/240min/MNQ_240min_backadjusted.csv
+```
+
+The default output is:
+
+```text
+data/backtest_exports/MNQ_240min_backadjusted_ohlc.csv
+```
+
+Export every generated back-adjusted continuous and aggregated file in one run:
+
+```bash
+uv run python scripts/export_ohlc.py \
+  --all \
+  --source backadjusted \
+  --timezone America/Chicago
+```
+
+This scans `data/continuous/hourly/` and `data/aggregated/`, skips non-OHLC
+files, and writes matching files under `data/backtest_exports/`.
+
+Timezone conversion happens before splitting `Date` and `Time`. Use
+`America/Chicago` for CME-style exchange-local timestamps, including daylight
+saving changes. Use `UTC` if the backtesting app expects UTC.
+
+Use a different separator if required:
+
+```bash
+uv run python scripts/export_ohlc.py \
+  --all \
+  --source backadjusted \
+  --timezone America/Chicago \
+  --separator tab
+```
+
+Write to a different folder:
+
+```bash
+uv run python scripts/export_ohlc.py \
+  --all \
+  --source backadjusted \
+  --output-dir /path/to/backtest/imports
+```
+
+Write one specific input file to one specific output file:
+
+```bash
+uv run python scripts/export_ohlc.py \
+  --input data/aggregated/session/MNQ_session_backadjusted.csv \
+  --output /path/to/MNQ_session.csv \
+  --timezone America/Chicago
+```
+
 ## Suggested End-To-End Workflow
 
 1. Install and verify the environment with `uv sync --dev` and `uv run pytest`.
@@ -287,7 +375,8 @@ data/validation/{SYMBOL}_validation_report.csv
 4. Build continuous hourly files with `scripts/build_continuous.py`.
 5. Aggregate research timeframes with `scripts/aggregate_bars.py`.
 6. Validate outputs with `scripts/validate_data.py`.
-7. Inspect roll schedules and adjustment audit files before using the data.
+7. Export app-ready OHLC files with `scripts/export_ohlc.py`.
+8. Inspect roll schedules and adjustment audit files before using the data.
 
 ## Operational Notes
 
